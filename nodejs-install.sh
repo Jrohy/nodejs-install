@@ -45,6 +45,13 @@ ipIsConnect(){
     fi
 }
 
+checkSys() {
+    #检查是否为Root
+    [ $(id -u) != "0" ] && { colorEcho ${RED} "Error: You must be root to run this script"; exit 1; }
+    # 缺失/usr/local/bin路径时自动添加
+    [[ -z `echo $PATH|grep /usr/local/bin` ]] && { echo 'export PATH=$PATH:/usr/local/bin' >> /etc/profile; source /etc/profile; }
+}
+
 setupProxy(){
     ipIsConnect "www.google.com"
     if [[ ! $? -eq 0 && -z `npm config list|grep taobao` ]]; then
@@ -74,6 +81,7 @@ installNodejs(){
 }
 
 main(){
+    checkSys
     installNodejs
     setupProxy
     echo -e "nodejs `colorEcho $BLUE $INSTALL_VERSION` 安装成功!"
