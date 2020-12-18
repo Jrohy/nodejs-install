@@ -6,10 +6,10 @@
 
 ## 安装/更新 最新版nodejs
 ```
-source <(curl -L https://git.io/nodejs-install)
+source <(curl -L https://nodejs-install.netlify.app/install.sh)
 ```
 
 ## 安装/更新 指定版本nodejs
 ```
-source <(curl -L https://git.io/nodejs-install) -v 14.12.0
+source <(curl -L https://nodejs-install.netlify.app/install.sh) -v 14.12.0
 ``` 
