@@ -67,6 +67,25 @@ setupProxy(){
     fi
 }
 
+sysArch(){
+    ARCH=$(uname -m)
+    if [[ "$ARCH" == "i686" ]] || [[ "$ARCH" == "i386" ]]; then
+        VDIS="linux-386"
+    elif [[ "$ARCH" == *"armv7"* ]] || [[ "$ARCH" == "armv6l" ]]; then
+        VDIS="linux-armv7l"
+    elif [[ "$ARCH" == *"armv8"* ]] || [[ "$ARCH" == "aarch64" ]]; then
+        VDIS="linux-arm64"
+    elif [[ "$ARCH" == *"s390x"* ]]; then
+        VDIS="linux-s390x"
+    elif [[ "$ARCH" == "ppc64le" ]]; then
+        VDIS="linux-ppc64le"
+    elif [[ "$ARCH" == *"darwin"* ]]; then
+        VDIS="darwin-x64"
+    elif [[ "$ARCH" == "x86_64" ]]; then
+        VDIS="linux-x64"
+    fi
+}
+
 installNodejs(){
     if [[ -z $INSTALL_VERSION ]];then
         echo "正在获取最新版nodejs..."
@@ -79,16 +98,18 @@ installNodejs(){
         fi
     fi
     [[ ! $INSTALL_VERSION =~ "v" ]] && INSTALL_VERSION="v${INSTALL_VERSION}"
-    BASENAME="node-$INSTALL_VERSION-linux-x64"
-    FILE_NAME="$BASENAME.tar.xz"
+    BASENAME="node-$INSTALL_VERSION-$VDIS"
+    FILE_NAME=`[[ "$ARCH" == *"darwin"* ]] && echo "$BASENAME.tar.gz" || echo "$BASENAME.tar.xz"`
     curl -L https://nodejs.org/dist/$INSTALL_VERSION/$FILE_NAME -o $FILE_NAME
-    tar xJvf $FILE_NAME
+    [[ ! $? -eq 0 ]] && { colorEcho $RED "下载安装失败!"; exit -1; }
+    [[ "$ARCH" == *"darwin"* ]] && tar xzvf $FILE_NAME || tar xJvf $FILE_NAME
     cp -rf $BASENAME/* /usr/local/
     rm -rf $BASENAME*
 }
 
 main(){
     checkSys
+    sysArch
     installNodejs
     setupProxy
     echo -e "nodejs `colorEcho $BLUE $INSTALL_VERSION` 安装成功!"
