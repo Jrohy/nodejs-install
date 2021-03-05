@@ -13,3 +13,8 @@ source <(curl -L https://nodejs-install.netlify.app/install.sh)
 ```
 source <(curl -L https://nodejs-install.netlify.app/install.sh) -v 14.12.0
 ``` 
+## 强制更新nodejs
+默认更新策略是已有版本和最新版本一样就不去更新, 要强制更新添加-f
+```
+source <(curl -L https://nodejs-install.netlify.app/install.sh) -f
+```

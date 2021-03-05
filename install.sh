@@ -7,6 +7,8 @@
 
 INSTALL_VERSION=""
 
+FORCE_MODE=0
+
 #######color code########
 RED="31m"      
 GREEN="32m"  
@@ -26,6 +28,11 @@ while [[ $# > 0 ]];do
         -v|--version)
         INSTALL_VERSION="$2"
         echo -e "准备安装$(colorEcho ${BLUE} $INSTALL_VERSION)版本nodejs..\n"
+        shift
+        ;;
+        -f)
+        FORCE_MODE=1
+        echo -e "强制更新nodejs..\n"
         shift
         ;;
         *)
@@ -65,7 +72,7 @@ installNodejs(){
         echo "正在获取最新版nodejs..."
         INSTALL_VERSION=`curl -H 'Cache-Control: no-cache'  "https://api.github.com/repos/nodejs/node/releases/latest" | grep 'tag_name' | cut -d\" -f4`
         echo "最新版nodejs: `colorEcho $BLUE $INSTALL_VERSION`"
-        if [[ `command -v node` ]];then
+        if [[ $FORCE_MODE == 0 && `command -v node` ]];then
             if [[ `node -v` == $INSTALL_VERSION ]];then
                 return
             fi
