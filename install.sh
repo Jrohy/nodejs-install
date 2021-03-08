@@ -114,9 +114,12 @@ installNodejs(){
     BASENAME="node-$INSTALL_VERSION-$VDIS"
     FILE_NAME=`[[ "$ARCH" == *"darwin"* ]] && echo "$BASENAME.tar.gz" || echo "$BASENAME.tar.xz"`
     curl -L https://nodejs.org/dist/$INSTALL_VERSION/$FILE_NAME -o $FILE_NAME
-    [[ ! $? -eq 0 ]] && { colorEcho $RED "下载安装失败!"; exit -1; }
     [[ "$ARCH" == *"darwin"* ]] && tar xzvf $FILE_NAME || tar xJvf $FILE_NAME
-    cp -rf $BASENAME/* /usr/local/
+    if [[ ! $? -eq 0 ]]; then 
+        colorEcho $RED "下载安装失败!"
+    else 
+        cp -rf $BASENAME/* /usr/local/
+    fi
     rm -rf $BASENAME*
 }
 
