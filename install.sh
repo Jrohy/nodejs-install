@@ -100,6 +100,10 @@ installNodejs(){
         else
             INSTALL_VERSION=`echo "$ALL_VERSION"|sed -n '2p'|grep -oP 'v\d*\.\d\d*\.\d+'|head -n 1`
         fi
+        if [[ $INSTALL_VERSION == "" ]];then
+            [[ $LATEST == 0 ]] && echo "获取最新长期支持版失败, 正在获取最新当前发布版.."
+            INSTALL_VERSION=`curl -H 'Cache-Control: no-cache'  "https://api.github.com/repos/nodejs/node/releases/latest" | grep 'tag_name' | cut -d\" -f4`
+        fi
         echo "最新版nodejs: `colorEcho $BLUE $INSTALL_VERSION`"
         if [[ $FORCE_MODE == 0 && `command -v node` ]];then
             if [[ `node -v` == $INSTALL_VERSION ]];then
