@@ -9,6 +9,8 @@ INSTALL_VERSION=""
 
 FORCE_MODE=0
 
+LATEST=0
+
 #######color code########
 RED="31m"      
 GREEN="32m"  
@@ -33,6 +35,10 @@ while [[ $# > 0 ]];do
         -f)
         FORCE_MODE=1
         echo -e "强制更新nodejs..\n"
+        shift
+        ;;
+        LATEST=1
+        echo -e "准备安装最新当前发布版nodejs..\n"
         shift
         ;;
         *)
@@ -88,8 +94,14 @@ sysArch(){
 
 installNodejs(){
     if [[ -z $INSTALL_VERSION ]];then
-        echo "正在获取最新版nodejs..."
-        INSTALL_VERSION=`curl -H 'Cache-Control: no-cache'  "https://api.github.com/repos/nodejs/node/releases/latest" | grep 'tag_name' | cut -d\" -f4`
+        if [[ $LATEST == 0 ]]; then
+            echo "正在获取最新长期支持版nodejs..."
+            INSTALL_VERSION=`curl -H 'Cache-Control: no-cache' https://nodejs.org/zh-cn/|grep downloadbutton|sed -n '1p'|grep -oP 'v\d*\.\d\d*\.\d+'|head -n 1`
+        else
+            echo "正在获取最新当前发布版nodejs..."
+            INSTALL_VERSION=`curl -H 'Cache-Control: no-cache' https://api.github.com/repos/nodejs/node/releases/latest|grep 'tag_name'|cut -d\" -f4`
+        fi
+        [[ ! $INSTALL_VERSION =~ "v" ]] && INSTALL_VERSION="v${INSTALL_VERSION}"
         echo "最新版nodejs: `colorEcho $BLUE $INSTALL_VERSION`"
         if [[ $FORCE_MODE == 0 && `command -v node` ]];then
             if [[ `node -v` == $INSTALL_VERSION ]];then
@@ -97,7 +109,6 @@ installNodejs(){
             fi
         fi
     fi
-    [[ ! $INSTALL_VERSION =~ "v" ]] && INSTALL_VERSION="v${INSTALL_VERSION}"
     BASENAME="node-$INSTALL_VERSION-$VDIS"
     FILE_NAME=`[[ "$ARCH" == *"darwin"* ]] && echo "$BASENAME.tar.gz" || echo "$BASENAME.tar.xz"`
     curl -L https://nodejs.org/dist/$INSTALL_VERSION/$FILE_NAME -o $FILE_NAME
