@@ -97,10 +97,10 @@ installNodejs(){
     if [[ -z $INSTALL_VERSION ]];then
         if [[ $LATEST == 0 ]]; then
             echo "正在获取最新长期支持版nodejs..."
-            INSTALL_VERSION=`curl -H 'Cache-Control: no-cache' https://nodejs.org/zh-cn/|grep downloadbutton|sed -n '1p'|grep -oP 'v\d*\.\d\d*\.\d+'|head -n 1`
+            INSTALL_VERSION=`curl -s -H 'Cache-Control: no-cache' https://nodejs.org/zh-cn/|grep downloadbutton|sed -n '1p'|grep -oP 'v\d*\.\d\d*\.\d+'|head -n 1`
         else
             echo "正在获取最新当前发布版nodejs..."
-            INSTALL_VERSION=`curl -H 'Cache-Control: no-cache' https://api.github.com/repos/nodejs/node/releases/latest|grep 'tag_name'|cut -d\" -f4`
+            INSTALL_VERSION=`curl -s -H 'Cache-Control: no-cache' https://api.github.com/repos/nodejs/node/releases/latest|grep 'tag_name'|cut -d\" -f4`
         fi
         [[ ! $INSTALL_VERSION =~ "v" ]] && INSTALL_VERSION="v${INSTALL_VERSION}"
         echo "最新版nodejs: `colorEcho $BLUE $INSTALL_VERSION`"
