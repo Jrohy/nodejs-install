@@ -117,6 +117,8 @@ installNodejs(){
     [[ "$ARCH" == *"darwin"* ]] && tar xzvf $FILE_NAME || tar xJvf $FILE_NAME
     if [[ ! $? -eq 0 ]]; then 
         colorEcho $RED "下载安装失败!"
+        rm -rf $BASENAME*
+        exit -1
     else 
         cp -rf $BASENAME/* /usr/local/
     fi
