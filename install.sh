@@ -95,14 +95,13 @@ sysArch(){
 
 installNodejs(){
     if [[ -z $INSTALL_VERSION ]];then
+        [[ $LATEST == 0 ]] && echo "正在获取最新长期支持版nodejs..." || echo "正在获取最新当前发布版nodejs..."
+        ALL_VERSION=`curl -s -H 'Cache-Control: no-cache' https://nodejs.org/zh-cn/|grep downloadbutton`
         if [[ $LATEST == 0 ]]; then
-            echo "正在获取最新长期支持版nodejs..."
-            INSTALL_VERSION=`curl -s -H 'Cache-Control: no-cache' https://nodejs.org/zh-cn/|grep downloadbutton|sed -n '1p'|grep -oP 'v\d*\.\d\d*\.\d+'|head -n 1`
+            INSTALL_VERSION=`echo "$ALL_VERSION"|sed -n '1p'|grep -oP 'v\d*\.\d\d*\.\d+'|head -n 1`
         else
-            echo "正在获取最新当前发布版nodejs..."
-            INSTALL_VERSION=`curl -s -H 'Cache-Control: no-cache' https://api.github.com/repos/nodejs/node/releases/latest|grep 'tag_name'|cut -d\" -f4`
+            INSTALL_VERSION=`echo "$ALL_VERSION"|sed -n '2p'|grep -oP 'v\d*\.\d\d*\.\d+'|head -n 1`
         fi
-        [[ ! $INSTALL_VERSION =~ "v" ]] && INSTALL_VERSION="v${INSTALL_VERSION}"
         echo "最新版nodejs: `colorEcho $BLUE $INSTALL_VERSION`"
         if [[ $FORCE_MODE == 0 && `command -v node` ]];then
             if [[ `node -v` == $INSTALL_VERSION ]];then
