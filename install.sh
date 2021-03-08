@@ -37,6 +37,7 @@ while [[ $# > 0 ]];do
         echo -e "强制更新nodejs..\n"
         shift
         ;;
+        -l)
         LATEST=1
         echo -e "准备安装最新当前发布版nodejs..\n"
         shift
