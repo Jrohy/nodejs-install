@@ -105,7 +105,7 @@ install_nodejs(){
         fi
         echo "最新版nodejs: `color_echo $blue $install_version`"
     fi
-    if [[ -z $force_mode && `command -v node` ]];then
+    if [[ $force_mode == 0 && `command -v node` ]];then
         if [[ `node -v` == $install_version ]];then
             return
         fi
