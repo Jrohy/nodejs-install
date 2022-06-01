@@ -102,10 +102,10 @@ install_nodejs(){
             install_version=`curl -H 'Cache-Control: no-cache'  "https://api.github.com/repos/nodejs/node/releases/latest" | grep 'tag_name' | cut -d\" -f4`
         fi
         echo "最新版nodejs: `color_echo $blue $install_version`"
-        if [[ -z $force_mode && `command -v node` ]];then
-            if [[ `node -v` == $install_version ]];then
-                return
-            fi
+    fi
+    if [[ -z $force_mode && `command -v node` ]];then
+        if [[ `node -v` == $install_version ]];then
+            return
         fi
     fi
     base_name="node-$install_version-$vdis"
