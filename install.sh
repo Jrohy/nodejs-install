@@ -5,39 +5,33 @@
 # cancel centos alias
 [[ -f /etc/redhat-release ]] && unalias -a
 
-INSTALL_VERSION=""
-
-FORCE_MODE=0
-
-LATEST=0
+latest=0
 
 #######color code########
-RED="31m"      
-GREEN="32m"  
-YELLOW="33m" 
-BLUE="36m"
-FUCHSIA="35m"
+red="31m"      
+green="32m"  
+yellow="33m" 
+blue="36m"
+fuchsia="35m"
 
-colorEcho(){
-    COLOR=$1
-    echo -e "\033[${COLOR}${@:2}\033[0m"
+color_echo(){
+    echo -e "\033[$1${@:2}\033[0m"
 }
 
 #######get params#########
 while [[ $# > 0 ]];do
-    KEY="$1"
-    case $KEY in
+    case "$1" in
         -v|--version)
-        INSTALL_VERSION="$2"
-        echo -e "准备安装$(colorEcho ${BLUE} $INSTALL_VERSION)版本nodejs..\n"
+        install_version="$2"
+        echo -e "准备安装$(color_echo ${blue} $install_version)版本nodejs..\n"
         shift
         ;;
         -f)
-        FORCE_MODE=1
+        force_mode=1
         echo -e "强制更新nodejs..\n"
         ;;
         -l)
-        LATEST=1
+        latest=1
         echo -e "准备安装最新当前发布版nodejs..\n"
         ;;
         *)
@@ -48,7 +42,7 @@ while [[ $# > 0 ]];do
 done
 #############################
 
-ipIsConnect(){
+ip_is_connect(){
     ping -c2 -i0.3 -W1 $1 &>/dev/null
     if [ $? -eq 0 ];then
         return 0
@@ -57,80 +51,80 @@ ipIsConnect(){
     fi
 }
 
-checkSys() {
+check_sys() {
     #检查是否为Root
-    [ $(id -u) != "0" ] && { colorEcho ${RED} "Error: You must be root to run this script"; exit 1; }
+    [ $(id -u) != "0" ] && { color_echo ${red} "Error: You must be root to run this script"; exit 1; }
     # 缺失/usr/local/bin路径时自动添加
     [[ -z `echo $PATH|grep /usr/local/bin` ]] && { echo 'export PATH=$PATH:/usr/local/bin' >> /etc/profile; source /etc/profile; }
 }
 
-setupProxy(){
-    ipIsConnect "www.google.com"
+setup_proxy(){
+    ip_is_connect "www.google.com"
     if [[ ! $? -eq 0 && -z `npm config list|grep taobao` ]]; then
         npm config set registry https://registry.npm.taobao.org
-        colorEcho $GREEN "当前网络环境为国内环境, 成功设置淘宝代理!"
+        color_echo $green "当前网络环境为国内环境, 成功设置淘宝代理!"
     fi
 }
 
-sysArch(){
-    ARCH=$(uname -m)
-    if [[ "$ARCH" == "i686" ]] || [[ "$ARCH" == "i386" ]]; then
-        VDIS="linux-386"
-    elif [[ "$ARCH" == *"armv7"* ]] || [[ "$ARCH" == "armv6l" ]]; then
-        VDIS="linux-armv7l"
-    elif [[ "$ARCH" == *"armv8"* ]] || [[ "$ARCH" == "aarch64" ]]; then
-        VDIS="linux-arm64"
-    elif [[ "$ARCH" == *"s390x"* ]]; then
-        VDIS="linux-s390x"
-    elif [[ "$ARCH" == "ppc64le" ]]; then
-        VDIS="linux-ppc64le"
-    elif [[ "$ARCH" == *"darwin"* ]]; then
-        VDIS="darwin-x64"
-    elif [[ "$ARCH" == "x86_64" ]]; then
-        VDIS="linux-x64"
+sys_arch(){
+    arch=$(uname -m)
+    if [[ "$arch" == "i686" ]] || [[ "$arch" == "i386" ]]; then
+        vdis="linux-386"
+    elif [[ "$arch" == *"armv7"* ]] || [[ "$arch" == "armv6l" ]]; then
+        vdis="linux-armv7l"
+    elif [[ "$arch" == *"armv8"* ]] || [[ "$arch" == "aarch64" ]]; then
+        vdis="linux-arm64"
+    elif [[ "$arch" == *"s390x"* ]]; then
+        vdis="linux-s390x"
+    elif [[ "$arch" == "ppc64le" ]]; then
+        vdis="linux-ppc64le"
+    elif [[ "$arch" == *"darwin"* ]]; then
+        vdis="darwin-x64"
+    elif [[ "$arch" == "x86_64" ]]; then
+        vdis="linux-x64"
     fi
 }
 
-installNodejs(){
-    if [[ -z $INSTALL_VERSION ]];then
-        [[ $LATEST == 0 ]] && echo "正在获取最新长期支持版nodejs..." || echo "正在获取最新当前发布版nodejs..."
-        ALL_VERSION=`curl -s -H 'Cache-Control: no-cache' https://nodejs.org/zh-cn/|grep downloadbutton`
-        if [[ $LATEST == 0 ]]; then
-            INSTALL_VERSION=`echo "$ALL_VERSION"|sed -n '1p'|grep -oP 'v\d*\.\d\d*\.\d+'|head -n 1`
+install_nodejs(){
+    if [[ -z $install_version ]];then
+        [[ $latest == 0 ]] && echo "正在获取最新长期支持版nodejs..." || echo "正在获取最新当前发布版nodejs..."
+        all_version=`curl -s -H 'Cache-Control: no-cache' https://nodejs.org/zh-cn/|grep downloadbutton`
+        if [[ $latest == 0 ]]; then
+            install_version=`echo "$all_version"|sed -n '1p'|grep -oP 'v\d*\.\d\d*\.\d+'|head -n 1`
         else
-            INSTALL_VERSION=`echo "$ALL_VERSION"|sed -n '2p'|grep -oP 'v\d*\.\d\d*\.\d+'|head -n 1`
+            install_version=`echo "$all_version"|sed -n '2p'|grep -oP 'v\d*\.\d\d*\.\d+'|head -n 1`
         fi
-        if [[ $INSTALL_VERSION == "" ]];then
-            [[ $LATEST == 0 ]] && echo "获取最新长期支持版失败, 正在获取最新当前发布版.."
-            INSTALL_VERSION=`curl -H 'Cache-Control: no-cache'  "https://api.github.com/repos/nodejs/node/releases/latest" | grep 'tag_name' | cut -d\" -f4`
+        if [[ $install_version == "" ]];then
+            [[ $latest == 0 ]] && echo "获取最新长期支持版失败, 正在获取最新当前发布版.."
+            install_version=`curl -H 'Cache-Control: no-cache'  "https://api.github.com/repos/nodejs/node/releases/latest" | grep 'tag_name' | cut -d\" -f4`
         fi
-        echo "最新版nodejs: `colorEcho $BLUE $INSTALL_VERSION`"
-        if [[ $FORCE_MODE == 0 && `command -v node` ]];then
-            if [[ `node -v` == $INSTALL_VERSION ]];then
+        echo "最新版nodejs: `color_echo $blue $install_version`"
+        if [[ -z $force_mode && `command -v node` ]];then
+            if [[ `node -v` == $install_version ]];then
                 return
             fi
         fi
     fi
-    BASENAME="node-$INSTALL_VERSION-$VDIS"
-    FILE_NAME=`[[ "$ARCH" == *"darwin"* ]] && echo "$BASENAME.tar.gz" || echo "$BASENAME.tar.xz"`
-    curl -L https://nodejs.org/dist/$INSTALL_VERSION/$FILE_NAME -o $FILE_NAME
-    [[ "$ARCH" == *"darwin"* ]] && tar xzvf $FILE_NAME || tar xJvf $FILE_NAME
+    base_name="node-$install_version-$vdis"
+    file_name=`[[ "$arch" == *"darwin"* ]] && echo "$base_name.tar.gz" || echo "$base_name.tar.xz"`
+    curl -L https://nodejs.org/dist/$install_version/$file_name -o $file_name
+    [[ "$arch" == *"darwin"* ]] && tar xzvf $file_name || tar xJvf $file_name
     if [[ ! $? -eq 0 ]]; then 
-        colorEcho $RED "下载安装失败!"
-        rm -rf $BASENAME*
+        color_echo $red "下载安装失败!"
+        rm -rf $base_name*
         exit 1
     else 
-        cp -rf $BASENAME/* /usr/local/
+        cp -rf $base_name/* /usr/local/
     fi
-    rm -rf $BASENAME*
+    rm -rf $base_name*
 }
 
 main(){
-    checkSys
-    sysArch
-    installNodejs
-    setupProxy
-    echo -e "nodejs `colorEcho $BLUE $INSTALL_VERSION` 安装成功!"
+    check_sys
+    sys_arch
+    install_nodejs
+    setup_proxy
+    echo -e "nodejs `color_echo $blue $install_version` 安装成功!"
 }
 
 main
