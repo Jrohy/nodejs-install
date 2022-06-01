@@ -7,6 +7,8 @@
 
 latest=0
 
+install_version=""
+
 #######color code########
 red="31m"      
 green="32m"  
