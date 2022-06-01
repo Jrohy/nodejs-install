@@ -25,6 +25,7 @@ while [[ $# > 0 ]];do
     case "$1" in
         -v|--version)
         install_version="$2"
+        [[ $install_version && ${install_version:0:1} != "v" ]] && install_version="v$install_version"
         echo -e "准备安装$(color_echo ${blue} $install_version)版本nodejs..\n"
         shift
         ;;
