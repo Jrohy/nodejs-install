@@ -7,6 +7,8 @@
 
 latest=0
 
+force_mode=0
+
 install_version=""
 
 #######color code########
