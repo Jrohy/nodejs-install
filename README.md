@@ -2,7 +2,7 @@
 ![](https://img.shields.io/github/stars/Jrohy/nodejs-install.svg)
 ![](https://img.shields.io/github/forks/Jrohy/nodejs-install.svg) 
 ![](https://img.shields.io/github/license/Jrohy/nodejs-install.svg)  
-一键安装最新版nodejs, 国内vps自动设置淘宝镜像源([registry.npm.taobao.org](https://registry.npm.taobao.org))
+一键安装最新版nodejs, 国内vps自动设置淘宝镜像源([npmmirror.com](https://npmmirror.com))
 
 ## 安装/更新 最新长期支持版nodejs
 ```

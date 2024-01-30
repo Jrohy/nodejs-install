@@ -66,7 +66,7 @@ check_sys() {
 setup_proxy(){
     ip_is_connect "www.google.com"
     if [[ ! $? -eq 0 && -z `npm config list|grep taobao` ]]; then
-        npm config set registry https://registry.npm.taobao.org
+        npm config set registry https://npmmirror.com
         color_echo $green "当前网络环境为国内环境, 成功设置淘宝代理!"
     fi
 }
