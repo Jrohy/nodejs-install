@@ -93,7 +93,7 @@ sys_arch(){
 install_nodejs(){
     if [[ -z $install_version ]];then
         [[ $latest == 0 ]] && echo "正在获取最新长期支持版nodejs..." || echo "正在获取最新当前发布版nodejs..."
-        all_version=`curl -s -H 'Cache-Control: no-cache' https://nodejs.org/zh-cn/|grep downloadbutton`
+        all_version=`curl -s -L -H 'Cache-Control: no-cache' https://nodejs.org|grep downloadbutton`
         if [[ $latest == 0 ]]; then
             install_version=`echo "$all_version"|sed -n '1p'|grep -oP 'v\d*\.\d\d*\.\d+'|head -n 1`
         else
